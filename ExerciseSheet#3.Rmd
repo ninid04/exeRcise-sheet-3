@@ -9,3 +9,12 @@ date: "2025-06-03"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Strengths
+
+-   Simultaneous Collaboration with other creators on the same project is possible
+-   It is able to track the changes you do on your file, this way it allows you to always hop back to earlier versions.
+
+## Weaknesses
+
+-   You need to learn new tools
+-   Multiple people working together and committing at the same time can cause confusion and problems when it comes to choosing the right changes (Merge Conflicts)
