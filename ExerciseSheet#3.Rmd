@@ -1,0 +1,11 @@
+---
+title: "ExerciseSheet#3"
+author: "Leoni Dorigatti,13013320" 
+output: html_document
+date: "2025-06-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
