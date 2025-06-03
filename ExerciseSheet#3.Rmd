@@ -18,3 +18,48 @@ knitr::opts_chunk$set(echo = TRUE)
 
 -   You need to learn new tools
 -   Multiple people working together and committing at the same time can cause confusion and problems when it comes to choosing the right changes (Merge Conflicts)
+
+# Exercise 3: Pixar Films
+
+### a)
+```{r}
+
+# download dataset
+install.packages("tidyverse")
+library("tidyverse")
+
+library(readr)
+
+pixar_films <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2025/2025-03-11/pixar_films.csv")
+
+# clean dataset
+pixar_films <- pixar_films %>% filter(!is.na(film))
+
+# Film rating inspection: it is a categorial variable, where "G", "PG" are values, G, stands for: General Audiance and PG, stands for Parental Guidance suggested
+unique(pixar_films$film_rating)
+
+# creat factor variable
+pixar_films$film_rating <- factor(pixar_films$film_rating)
+
+```
+Reason for using factor: this variable is divided into categories and not numbers, this is important to aknowledge especially to help with analizing and grouping.
+
+### b)
+```{r}
+# inspect titles
+unique(pixar_films$film)
+
+library(tidyverse)
+library(stringr)
+
+series_titles <- pixar_films %>%
+  filter(str_detect(film, "Toy Story|Cars|Finding|Incredibles")) %>%
+  mutate(series = case_when(
+    str_detect(film, "Toy Story") ~ "Toy Story",
+    str_detect(film, "Cars") ~ "Cars",
+    str_detect(film, "Finding") ~ "Finding",
+    str_detect(film, "Incredibles") ~ "Incredibles"
+  ))
+```
+
+
