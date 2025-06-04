@@ -25,7 +25,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 
 # download dataset
-install.packages("tidyverse")
+
 library("tidyverse")
 
 library(readr)
@@ -52,7 +52,7 @@ unique(pixar_films$film)
 library(tidyverse)
 library(stringr)
 
-series_titles <- pixar_films %>%
+title_series <- pixar_films %>%
   filter(str_detect(film, "Toy Story|Cars|Finding|Incredibles")) %>%
   mutate(series = case_when(
     str_detect(film, "Toy Story") ~ "Toy Story",
@@ -60,6 +60,62 @@ series_titles <- pixar_films %>%
     str_detect(film, "Finding") ~ "Finding",
     str_detect(film, "Incredibles") ~ "Incredibles"
   ))
+
+# group series
+summary_series<- title_series%>%
+  group_by(series)%>%
+  summarise(
+    titles = paste(film, collapse = ", "),
+    count = n()
+  )
+
+# final output
+summary_series
+
+```
+### c)
+```{r}
+# load package
+public_response <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2025/2025-03-11/public_response.csv")
+
+# converting into factor
+public_response$cinema_score <- factor(public_response$cinema_score,
+        levels=c( "A-", "A", "A+"),
+ordered=TRUE)
+
+# out two datasets together
+pixar_combined <- left_join(pixar_films, public_response, by="film")
+
 ```
 
+### d)
+```{r}
+# creat plot for visualization of the rotten tomatoes score
+pixar_combined <- pixar_combined %>%
+  mutate(series = case_when(
+    str_detect(film, "Toy Story") ~ "Toy Story",
+    str_detect(film, "Cars") ~ "Cars",
+    str_detect(film, "Finding") ~ "Finding",
+    str_detect(film, "Incredibles") ~ "Incredibles",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(series))
 
+library(ggplot2)
+
+ggplot(pixar_combined, aes(
+  x= series,
+  y= rotten_tomatoes,
+  fill= film
+))+ geom_bar(
+  stat = "identity", 
+  position = position_dodge())+ labs(
+    title = "The rotten Tomatoes Score",
+    subtitle = "of Pixar Film Series",
+    x= "Film Series",
+    y= "Rotten Tomatoes Score"
+  )+ theme_light()
+
+
+```
+From the plot you can notice how the Rotten Tomatoes score stayed pretty consistent amongst the sequels in the series, with most of the cases slowly increasing with the second/third movies, except for 'Cars', where in the second movie, the score was way lower, almost half of compared to the other two movies. Another thing that distinguishes the 'Cars' series from the other three, is the noticeable lower 'Rotten Tomatoes Score'.
