@@ -9,19 +9,24 @@ date: "2025-06-03"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Strengths
+## Exercise 2
+
+### Strengths
 
 -   Simultaneous Collaboration with other creators on the same project is possible
 -   It is able to track the changes you do on your file, this way it allows you to always hop back to earlier versions.
 
-## Weaknesses
+### Weaknesses
 
 -   You need to learn new tools
 -   Multiple people working together and committing at the same time can cause confusion and problems when it comes to choosing the right changes (Merge Conflicts)
 
-# Exercise 3: Pixar Films
+GItHub link: <https://github.com/ninid04/exeRcise-sheet-3>
+
+## Exercise 3: Pixar Films
 
 ### a)
+
 ```{r}
 
 # download dataset
@@ -42,9 +47,11 @@ unique(pixar_films$film_rating)
 pixar_films$film_rating <- factor(pixar_films$film_rating)
 
 ```
+
 Reason for using factor: this variable is divided into categories and not numbers, this is important to aknowledge especially to help with analizing and grouping.
 
 ### b)
+
 ```{r}
 # inspect titles
 unique(pixar_films$film)
@@ -73,7 +80,9 @@ summary_series<- title_series%>%
 summary_series
 
 ```
+
 ### c)
+
 ```{r}
 # load package
 public_response <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2025/2025-03-11/public_response.csv")
@@ -89,6 +98,7 @@ pixar_combined <- left_join(pixar_films, public_response, by="film")
 ```
 
 ### d)
+
 ```{r}
 # creat plot for visualization of the rotten tomatoes score
 pixar_combined <- pixar_combined %>%
@@ -118,4 +128,81 @@ ggplot(pixar_combined, aes(
 
 
 ```
+
 From the plot you can notice how the Rotten Tomatoes score stayed pretty consistent amongst the sequels in the series, with most of the cases slowly increasing with the second/third movies, except for 'Cars', where in the second movie, the score was way lower, almost half of compared to the other two movies. Another thing that distinguishes the 'Cars' series from the other three, is the noticeable lower 'Rotten Tomatoes Score'.
+
+## Exercise 4: Open Analysis
+
+### a)
+
+```{r}
+library(tidyverse)
+
+food_waste <- read_csv("data/Food waste in the European Union - Europa (2010).csv")
+
+```
+
+### b)
+
+### c)
+
+### d) Research question
+
+"Which 5 countries contributed the most in terms of Total Food wastage in the European Union in 2010?"
+
+This question is interesting because it highlights the countries the contribute the most, making it possible to maybe target them and insert for example policy interventions.
+
+### e)
+
+```{r}
+# clean data
+library(janitor)
+
+food_waste<- food_waste %>% janitor::clean_names()
+food_waste_countries <- food_waste %>%
+  filter(entity != "European Union")
+
+head(food_waste)
+
+
+# group country
+top_5_countries <- food_waste_countries %>%
+  select(entity, total_food_waste_europa_2010) %>%
+  arrange(desc(total_food_waste_europa_2010)) %>%
+  slice_max(total_food_waste_europa_2010, n = 5)
+
+top_5_countries
+
+```
+The Top 5 countries in the European Union with the highest Food Waste in 2010 are: UK, Germany, Netherlands, France and Poland, with the Uk bring at the Top with a Total of 14.391.000 tonnes of wastage.
+
+### f) Plot
+
+```{r  fig.cap="Figure 1: Comparison of total food waste in the EU (2010) between the top 5 countries and all other countries.", out.width="80%"}
+library(ggplot2)
+
+# sum the rest of the countries food waste
+other_total <- food_waste_countries %>%
+  slice(6:n()) %>%
+  summarise(
+    total_food_waste_europa_2010 = sum(total_food_waste_europa_2010, na.rm = TRUE)
+  ) %>%
+  mutate(entity = "Other Countries")
+
+# add and bind withe the top 5
+combined_data <- bind_rows(top_5_countries, other_total)
+
+# plot
+ggplot(combined_data, aes(x = reorder(entity, -total_food_waste_europa_2010), y = total_food_waste_europa_2010, fill = entity)) +
+  geom_col() +
+  labs(
+    title = "Total Food Waste in the EU (2010)",
+    subtitle = "Top 5  vs All Other Countries",
+    x = "Country / Group",
+    y = "Total Food Waste (Tonnes)",
+    fill = "Country / Group"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
